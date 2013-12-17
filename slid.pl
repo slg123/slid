@@ -30,7 +30,7 @@ sub get_md5sums {
 }
 
 #compare against current database
-sub compare { 
+sub compare_files { 
     if ( -e $signatures_file ) {
         my $cmd = "diff $signatures_file $found_signatures"; 
         open my $cmd_pipe, "-|", $cmd or die "pipe from $cmd failed: $!";
@@ -60,7 +60,7 @@ sub send_report {
 
 sub gather_and_report {
     get_md5sums(); 
-    compare();
+    compare_files();
     send_report();
 }
 gather_and_report(); 
