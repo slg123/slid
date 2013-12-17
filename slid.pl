@@ -26,6 +26,8 @@ sub get_md5sums {
     while ( <$cmd_pipe> ) {
         print { $out_fh } $_; 
     }
+    close $cmd_pipe;
+    close $out_fh;
 }
 
 sub compare_files { 
@@ -41,6 +43,8 @@ sub compare_files {
         while ( <$cmd_pipe> ) {
             print { $out_fh } $_;
         }
+        close $cmd_pipe;
+        close $out_fh;
     } else {
         mv $found_signatures $signatures_file;
         print "no prior report found.\n"; 
@@ -48,23 +52,25 @@ sub compare_files {
 }
 
 sub send_report {
+
     use MIME::Lite;
     my $msg = MIME::Lite->new(
-        From    => 'root@om.houqe.lab',
-        To      => 'scott.gillespie@netiq.com',
-        Subject => 'simple linux intrusion detector'
+        From     => 'root@om.houqe.lab',
+        To       => 'scott.gillespie@netiq.com',
+        Cc       => 'scott_layne_gillespie@hotmail.com',
+        Subject  => 'home dir checksum diffs',
+        Type     => 'TEXT',
+        Encoding => 'base64',
+        Path     => $diff_file
     );
 
-    $msg->attach(
-        Type     => 'text/plain',
-        Path     => '/Unix2/Unix/scottg/projects/SLID',
-        Filename => $diff_file
-    );
+    $msg->send();
+    print "email sent."; 
 }
 
 sub gather_and_report {
-    get_md5sums(); 
-    compare_files();
+    #get_md5sums(); 
+    #compare_files();
     send_report();
 }
 gather_and_report(); 
