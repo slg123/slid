@@ -69,8 +69,8 @@ sub send_report {
 }
 
 sub gather_and_report {
-    #get_md5sums(); 
-    #compare_files();
+    get_md5sums(); 
+    compare_files();
     send_report();
 }
 gather_and_report(); 
