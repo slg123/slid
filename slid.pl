@@ -17,7 +17,7 @@ if ( ! -e $signatures_file ) {
 # generate new md5sums for comparison with $signatures_file
 sub get_md5sums {
     my $cmd = 'find /Unix2/Unix/scottg \( -wholename "/Unix2/Unix/scottg/perforce/projects/SLID/*" -o -wholename "/Unix2/Unix/scottg/perforce/*" \) -prune -o -print | xargs md5sum 2>/dev/null'; 
-
+    # remove found signatures file if present
     if ( -e $found_signatures ) {
         unlink( $found_signatures ); 
     }
@@ -52,7 +52,6 @@ sub compare_files {
 }
 
 sub send_report {
-
     use MIME::Lite;
     my $msg = MIME::Lite->new(
         From     => 'root@om.houqe.lab',
