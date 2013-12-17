@@ -5,9 +5,9 @@
 use strict;
 use warnings;
 
-our $signatures_file  = 'signatures';            # database to compare to
+our $signatures_file  = 'signatures';       # database to compare to
 our $found_signatures = 'md5sigs_current';  # found signatures from find command
-our $diff_file        = 'signatures.diff';
+our $diff_file        = 'signatures.diff';  # diff file to send
 
 if ( ! -e $signatures_file ) {
     print "no signatures file found. exiting.\n"; 
@@ -16,7 +16,6 @@ if ( ! -e $signatures_file ) {
 
 # generate new md5sums for comparison with $signatures_file
 sub get_md5sums {
-
     my $cmd = 'find /Unix2/Unix/scottg \( -wholename "/Unix2/Unix/scottg/perforce/projects/SLID/*" -o -wholename "/Unix2/Unix/scottg/perforce/*" \) -prune -o -print | xargs md5sum 2>/dev/null'; 
 
     if ( -e $found_signatures ) {
@@ -29,8 +28,12 @@ sub get_md5sums {
     }
 }
 
-#compare against current database
 sub compare_files { 
+    # remove previous diff file
+    if ( -e $diff_file ) {
+        unlink( $diff_file );
+    }
+
     if ( -e $signatures_file ) {
         my $cmd = "diff $signatures_file $found_signatures"; 
         open my $cmd_pipe, "-|", $cmd or die "pipe from $cmd failed: $!";
@@ -46,15 +49,16 @@ sub compare_files {
 
 sub send_report {
     use MIME::Lite;
-    $msg = MIME::Lite->new(
-        To      => 'scott.gillespie@netiq.com',
+    my $msg = MIME::Lite->new(
         From    => 'root@om.houqe.lab',
-        Subject => "simple linux intrusion detector"
+        To      => 'scott.gillespie@netiq.com',
+        Subject => 'simple linux intrusion detector'
     );
 
     $msg->attach(
-        Type     => "text/plain",
-        Filename =>  $diff_file
+        Type     => 'text/plain',
+        Path     => '/Unix2/Unix/scottg/projects/SLID',
+        Filename => $diff_file
     );
 }
 
