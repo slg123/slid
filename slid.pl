@@ -46,7 +46,7 @@ sub compare_files {
         close $cmd_pipe;
         close $out_fh;
     } else {
-        mv $found_signatures $signatures_file;
+        `mv $found_signatures $signatures_file`;
         print "no prior report found.\n"; 
     }
 }
